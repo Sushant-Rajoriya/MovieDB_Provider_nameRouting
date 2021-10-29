@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movie_db_provider_file_manage/src/coman/my_widget/my_text_field.dart';
-import 'package:movie_db_provider_file_manage/src/logic/auth_cubit/auth_cubit.dart';
-import 'package:movie_db_provider_file_manage/src/screens/login/login.dart';
+import 'package:movie_db_provider_file_manage/src/coman/router/app_route.dart';
+import 'package:movie_db_provider_file_manage/src/logic/signup_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -14,6 +14,8 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  late SignupProvider signupProvider = Provider.of<SignupProvider>(context);
+
   @override
   Widget build(BuildContext context) {
     String userName = "";
@@ -26,16 +28,18 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              BlocListener<AuthCubit, AuthState>(
-                listener: (context, state) {
-                  if (state.saveData) {
+              Consumer<SignupProvider>(
+                builder: (context, value, Widget? child) {
+                  if (value.dataSaved) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Save Data in Database !'),
-                        duration: Duration(microseconds: 600),
+                        duration: Duration(microseconds: 1000),
                       ),
                     );
+                    Navigator.of(context).pushNamed(AppRoute.loginScreen);
                   }
+                  return const SizedBox.shrink();
                 },
                 child: const SizedBox(height: 40),
               ),
@@ -115,11 +119,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                BlocProvider.of<AuthCubit>(context).singUp(
+                                signupProvider.singUp(
                                     userName, password, int.parse(age), email);
-
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const LoginScreen()));
                               },
                               child: const CircleAvatar(
                                 backgroundColor: Colors.white,
@@ -139,8 +140,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LoginScreen()));
+                  Navigator.of(context).pushNamed(AppRoute.loginScreen);
                 },
                 child: Text(
                   "Login",

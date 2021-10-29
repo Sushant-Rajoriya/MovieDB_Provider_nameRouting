@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_db_provider_file_manage/src/coman/keys/keys.dart';
+import 'package:movie_db_provider_file_manage/src/coman/router/app_route.dart';
+import 'package:movie_db_provider_file_manage/src/logic/login_provider.dart';
 import 'package:movie_db_provider_file_manage/src/logic/movie_details_provider.dart';
 import 'package:movie_db_provider_file_manage/src/logic/movies_provider.dart';
 import 'package:movie_db_provider_file_manage/src/resource/my_colors.dart';
@@ -21,17 +23,30 @@ class _HomeScreenState extends State<HomeScreen> {
   late MovieProvider movieProvider = Provider.of<MovieProvider>(context);
   late MovieDetailsProvider movieDetailsProvider =
       Provider.of<MovieDetailsProvider>(context);
+  late LoginProvider loginProvider = Provider.of<LoginProvider>(context);
 
   @override
   void dispose() {
     movieProvider.dispose();
+    movieDetailsProvider.dispose();
+    loginProvider.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    loginProvider.chcekUser();
     return Scaffold(
-      drawer: MyDrawer(userName: widget.userName),
+      drawer: Consumer<LoginProvider>(builder: (context, value, Widget? child) {
+        if (value.isLogin) {
+          Navigator.of(context).pushNamed(AppRoute.loginScreen);
+
+          return MyDrawer(userName: value.userName);
+        } else {
+          Navigator.of(context).pushNamed(AppRoute.loginScreen);
+        }
+        return const SizedBox.shrink();
+      }),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Consumer<MovieProvider>(
                 builder: (context, value, Widget? child) {
-                  movieProvider.fatchTrendingMovie();
+//movieProvider.fatchTrendingMovie();
                   return ListView.builder(
                     padding: const EdgeInsets.all(8),
                     scrollDirection: Axis.vertical,

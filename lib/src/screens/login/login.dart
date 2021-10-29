@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movie_db_provider_file_manage/src/coman/my_widget/my_text_field.dart';
-import 'package:movie_db_provider_file_manage/src/logic/auth_cubit/auth_cubit.dart';
-import 'package:movie_db_provider_file_manage/src/screens/home/home_screen.dart';
-import 'package:movie_db_provider_file_manage/src/screens/singup/signup.dart';
+import 'package:movie_db_provider_file_manage/src/coman/router/app_route.dart';
+import 'package:movie_db_provider_file_manage/src/logic/login_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,8 +14,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  late LoginProvider loginProvider = Provider.of<LoginProvider>(context);
+
   @override
   Widget build(BuildContext context) {
+    loginProvider.chcekUser();
     String userName = "";
     String password = "";
     return Scaffold(
@@ -35,14 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              BlocListener<AuthCubit, AuthState>(
-                listener: (context, state) {
-                  if (state.hasData) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => HomeScreen(
-                        userName: userName,
-                      ),
-                    ));
+              Consumer<LoginProvider>(
+                builder: (context, value, Widget? child) {
+                  if (value.isLogin) {
+                    Navigator.of(context).pushNamed(AppRoute.homeScreen);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -51,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     );
                   }
+                  return const SizedBox.shrink();
                 },
                 child: Text(
                   "Welcome Back !",
@@ -104,8 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                BlocProvider.of<AuthCubit>(context)
-                                    .login(userName, password);
+                                loginProvider.login(userName, password);
                               },
                               child: const CircleAvatar(
                                 backgroundColor: Colors.white,
@@ -125,11 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                            value: BlocProvider.of<AuthCubit>(context),
-                            child: const SignupScreen(),
-                          )));
+                  Navigator.of(context).pushNamed(AppRoute.signupScreen);
                 },
                 child: Text(
                   "Sign Up",

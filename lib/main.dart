@@ -4,9 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movie_db_provider_file_manage/src/coman/router/app_route.dart';
 import 'src/data/model/user_table.dart';
 
-//import 'package:movie_db_provider_file_manage/src/coman/routes/app_route.dart'
-//  as route;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -24,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
